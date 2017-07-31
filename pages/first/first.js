@@ -1,17 +1,31 @@
 var Bmob = require('../../utils/bmob.js');
 var common = require('../../utils/common.js');
-var app = getApp()
+var app = getApp();
+
 Page({
 
-  onLoad: function () {
+  onLoad: function (e) {
+    var that = this
+    //调用应用实例的方法获取全局数据
+    app.getUserInfo(function (userInfo) {
+      console.log(userInfo)
+      //更新数据
+      that.setData({
+        userInfo: userInfo
+      })
+    });
 
+    this.setData({
+      "login_name": "王艳明",
+      "card_id": "080621",
+      "phone_no": "13009419939"
+    });
   },
   formSubmit: function (event) {
 
     wx.showLoading({
       title: '用户绑定中，请稍后！',
     })
-
 
     if (event.detail.value.login_name == "") {
       wx.showLoading({
@@ -26,6 +40,10 @@ Page({
         title: '请输入电话号码',
       })
     }
+
+
+
+
 
     setTimeout(function () {
       wx.hideLoading()
