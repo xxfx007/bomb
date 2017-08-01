@@ -87,6 +87,7 @@ App({
     }
   },
   globalData: {
-    userInfo: null
+    userInfo: null,
+    flg:"12345"
   }
 })

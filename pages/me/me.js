@@ -7,11 +7,11 @@ Page({
   onLoad: function (e) {
     // app.globalData.flg="aaaa"
     // console.log(app.globalData.flg);
-    
+
     var that = this
     //调用应用实例的方法获取全局数据
     app.getUserInfo(function (userInfo) {
-      console.log(userInfo)
+      //console.log(userInfo)
       //更新数据
       that.setData({
         userInfo: userInfo
@@ -25,21 +25,20 @@ Page({
       query.equalTo("wx_name", nkname);
 
       //query.find({ success: function (result) { }, error: function (error) { }})
-      query.find({ success: function (result) { 
-        var cnt = result.length;
-        if (cnt == 0) {
+      query.find({
+        success: function (result) {
 
-        }else{
-          //在tab中的页面 迁移的时候 用这个方法
-          wx.switchTab({
-            url: '../person/person'
-          })
+          //console.log(result[0].attributes.name);
+          that.setData({
+            "login_name": result[0].attributes.name,
+            "card_id": result[0].attributes.card_id,
+            "phone_no": result[0].attributes.phone_no
+        });
 
-        }
+        }, error: function (error) { }
+      })
 
-      }, error: function (error) { } })
-    
-     
+
     });
 
     // this.setData({
@@ -48,11 +47,11 @@ Page({
     //   "phone_no": "13009419939"
     // });
 
-   
+
 
   },
-  
-  
+
+
   formSubmit: function (event) {
 
     wx.showLoading({
@@ -98,11 +97,11 @@ Page({
               var cnt = results.length;
               var id = results[0]["id"];
               // console.log(results[0]["id"]);
-              if (cnt == 0) { 
+              if (cnt == 0) {
                 wx.showLoading({
                   title: '该卡号查询不到，不能绑定!!!',
                 });
-              } else { 
+              } else {
                 // 卡号也存在，可以继续
                 // 执行update语句，更新微信名
                 query = new Bmob.Query(member);
@@ -126,13 +125,13 @@ Page({
           })
 
         }
- 
+
       },
       error: function (error) {
         console.log("查询失败: " + error.code + " " + error.message);
       }
     });
-    
+
 
 
     setTimeout(function () {

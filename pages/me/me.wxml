@@ -1,8 +1,16 @@
 <import src="../../style/footer.wxml"  />
-<view class="page__hd i-header">
-    <view class="i-header-h1 h50">【基准劳灾专用】</view>
-    <view class="i-header-h1">绑定用户</view>
-</view>
+    <view class="page__hd i-header">
+        <view class="g-bd">
+            <view></view>
+            <view class="g-bda">
+                <view bindtap="" class="g-bda-userinfo">
+                    <image class="userinfo-avatar" src="{{userInfo.avatarUrl}}"></image>
+                    <text class="userinfo-nickname">{{userInfo.nickName}}</text>
+                </view>
+            </view>
+        </view>
+    </view>
+
 <form bindsubmit="formSubmit" bindreset="formReset">
     <view class="section">
         <input placeholder="" name="wxname" value="{{userInfo.nickName}}" disabled="false" />

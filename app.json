@@ -16,8 +16,8 @@
     "pages/getOpenId/getOpenId",
     "pages/register/register",
     "pages/picasa/picasa",
-    "pages/pay/pay"
-    
+    "pages/pay/pay",
+    "pages/me/me"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -44,7 +44,7 @@
         "text": "项目人员"
       },
       {
-        "pagePath": "pages/account/account",
+        "pagePath": "pages/me/me",
         "iconPath": "image/wechat.png",
         "selectedIconPath": "image/wechatHL.png",
         "text": "我的信息"
