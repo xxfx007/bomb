@@ -5,6 +5,12 @@ var app = getApp();
 Page({
 
   onLoad: function (e) {
+
+   
+    wx.switchTab({
+      url: '../person/person'
+    })
+
     var that = this
     //调用应用实例的方法获取全局数据
     app.getUserInfo(function (userInfo) {
@@ -13,6 +19,29 @@ Page({
       that.setData({
         userInfo: userInfo
       })
+
+      //console.log(userInfo.nickName)
+      var nkname = userInfo.nickName
+
+      var member = Bmob.Object.extend("member");
+      var query = new Bmob.Query(member);
+      query.equalTo("wx_name", nkname);
+
+      //query.find({ success: function (result) { }, error: function (error) { }})
+      query.find({ success: function (result) { 
+        var cnt = result.length;
+        if (cnt == 0) {
+
+        }else{
+          console.log("111111111")
+          wx.redirectTo({
+            url: '../person/person'
+          })
+        }
+
+      }, error: function (error) { } })
+    
+     
     });
 
     this.setData({
@@ -21,8 +50,11 @@ Page({
       "phone_no": "13009419939"
     });
 
+   
 
   },
+  
+  
   formSubmit: function (event) {
 
     wx.showLoading({
@@ -53,7 +85,10 @@ Page({
         var cnt = results.length;
         if (cnt == 0) {
           //微信名在数据库中不存在，需要验证一些信息,之后绑定
+          //console.log(event.detail.value.login_name);
+          query = new Bmob.Query(member);
           query.equalTo("name", event.detail.value.login_name);
+          query.equalTo("wx_name", "");
           query.find({
             success: function (results) {
               console.log("共查询到 " + results.length + " 条记录");
@@ -62,13 +97,17 @@ Page({
                 wx.showLoading({
                   title: '该姓名查询不到，不能绑定!!!',
                 });
+
               } else {
                 //该用户存在,可以继续
+                query = new Bmob.Query(member);
                 query.equalTo("name", event.detail.value.login_name);
                 query.equalTo("card_id", event.detail.value.card_id);
                 query.find({
                   success: function (results) {
                     var cnt = results.length;
+                    var id = results[0]["id"];
+                    // console.log(results[0]["id"]);
                     if (cnt == 0) {
                       wx.showLoading({
                         title: '该卡号查询不到，不能绑定!!!',
@@ -76,7 +115,18 @@ Page({
                     } else {
                       // 卡号也存在，可以继续
                       // 执行update语句，更新微信名
-                      
+                      query = new Bmob.Query(member);
+                      query.get(id, { success: function (result) {
+                        result.set("wx_name",event.detail.value.wxname);
+                        result.save();
+
+                        common.showTip("绑定成功,正在跳转", "success", function () {
+                          wx.redirectTo({
+                            url: '../person/person'
+                          })
+                        });
+
+                      }, error: function (object, error){}})
                     }
                   },
                   error: function (error) { }
@@ -92,7 +142,11 @@ Page({
 
         } else {
           //该用户已经绑定了，可以直接跳转
-
+          common.showTip("绑定成功,正在跳转", "success", function () {
+            wx.redirectTo({
+              url: '../person/person'
+            })
+          });
         }
       },
       error: function (error) { }
