@@ -13,7 +13,7 @@ Page({
     app.getUserInfo(function (userInfo) {
       console.log(userInfo)
       //更新数据
-      that.setData({
+      that.setData({ 
         userInfo: userInfo
       })
 
@@ -32,7 +32,7 @@ Page({
         }else{
           //在tab中的页面 迁移的时候 用这个方法
           wx.switchTab({
-            url: '../person/person'
+            url: '../server/server'
           })
 
         }
@@ -71,67 +71,70 @@ Page({
       wx.showLoading({
         title: '请输入电话号码',
       })
+    }else{
+      var member = Bmob.Object.extend("member");
+      //微信名在数据库中不存在，需要验证一些信息,之后绑定
+      //console.log(event.detail.value.login_name);
+      var query = new Bmob.Query(member);
+      console.log(event.detail.value.login_name);
+      query.equalTo("name", event.detail.value.login_name);
+      query.equalTo("wx_name", null);
+      query.find({
+        success: function (results) {
+          console.log("共查询到 " + results.length + " 条记录");
+          var cnt = results.length;
+          if (cnt == 0) {
+            wx.showLoading({
+              title: '该姓名查询不到，不能绑定!!!',
+            });
+
+          } else {
+            //该用户存在,可以继续
+            query = new Bmob.Query(member);
+            query.equalTo("name", event.detail.value.login_name);
+            query.equalTo("card_id", event.detail.value.card_id);
+            query.find({
+              success: function (results) {
+                var cnt = results.length;
+                var id = results[0]["id"];
+                // console.log(results[0]["id"]);
+                if (cnt == 0) {
+                  wx.showLoading({
+                    title: '该卡号查询不到，不能绑定!!!',
+                  });
+                } else {
+                  // 卡号也存在，可以继续
+                  // 执行update语句，更新微信名
+                  query = new Bmob.Query(member);
+                  query.get(id, {
+                    success: function (result) {
+                      result.set("wx_name", event.detail.value.wxname);
+                      result.set("phone_no", event.detail.value.phone_no);
+                      result.save();
+
+                      common.showTip("绑定成功,正在跳转", "success", function () {
+                        wx.switchTab({
+                          url: '../server/server'
+                        })
+                      });
+
+                    }, error: function (object, error) { }
+                  })
+                }
+              },
+              error: function (error) { }
+            })
+
+          }
+
+        },
+        error: function (error) {
+          console.log("查询失败: " + error.code + " " + error.message);
+        }
+      });
     }
 
-    var member = Bmob.Object.extend("member");
-    //微信名在数据库中不存在，需要验证一些信息,之后绑定
-    //console.log(event.detail.value.login_name);
-    var query = new Bmob.Query(member);
-    query.equalTo("name", event.detail.value.login_name);
-    query.equalTo("wx_name", "");
-    query.find({
-      success: function (results) {
-        console.log("共查询到 " + results.length + " 条记录");
-        var cnt = results.length;
-        if (cnt == 0) {
-          wx.showLoading({
-            title: '该姓名查询不到，不能绑定!!!',
-          });
-
-        } else {
-          //该用户存在,可以继续
-          query = new Bmob.Query(member);
-          query.equalTo("name", event.detail.value.login_name);
-          query.equalTo("card_id", event.detail.value.card_id);
-          query.find({
-            success: function (results) {
-              var cnt = results.length;
-              var id = results[0]["id"];
-              // console.log(results[0]["id"]);
-              if (cnt == 0) { 
-                wx.showLoading({
-                  title: '该卡号查询不到，不能绑定!!!',
-                });
-              } else { 
-                // 卡号也存在，可以继续
-                // 执行update语句，更新微信名
-                query = new Bmob.Query(member);
-                query.get(id, {
-                  success: function (result) {
-                    result.set("wx_name", event.detail.value.wxname);
-                    result.set("phone_no", event.detail.value.phone_no);
-                    result.save();
-
-                    common.showTip("绑定成功,正在跳转", "success", function () {
-                      wx.switchTab({
-                        url: '../person/person'
-                      })
-                    });
-
-                  }, error: function (object, error) { }
-                })
-              }
-            },
-            error: function (error) { }
-          })
-
-        }
- 
-      },
-      error: function (error) {
-        console.log("查询失败: " + error.code + " " + error.message);
-      }
-    });
+    
     
 
 
